@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,9 +28,9 @@ public class MyItemWriter extends AbstractItemWriter {
         // We set jberet.local-tx=true in job xml so we have to manipulate transactions with UserTransaction
         ut.begin();
         try (Connection cn = ds.getConnection();
-             PreparedStatement ps = cn.prepareStatement("insert into dest (data) values (?)")) {
+             PreparedStatement ps = cn.prepareStatement(getSQL())) {
             for (Object o : items) {
-                ps.setInt(1, (Integer) o);
+                bindParameters(ps, o);
                 ps.addBatch();
                 log.log(Level.FINE, "added to batch: {0}", o);
             }
@@ -40,5 +41,14 @@ public class MyItemWriter extends AbstractItemWriter {
             ut.rollback();
             throw e;
         }
+    }
+
+    protected String getSQL() {
+        return "insert into dest (data) values (?)";
+    }
+
+    protected void bindParameters(PreparedStatement ps, Object item) throws SQLException {
+        // We can set parameters to ps here
+        ps.setInt(1, (Integer) item);
     }
 }
