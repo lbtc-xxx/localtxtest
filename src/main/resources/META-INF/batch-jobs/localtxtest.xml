@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="localtxtest" version="1.0" xmlns="http://xmlns.jcp.org/xml/ns/javaee">
+
+    <step id="prepare" next="test">
+        <batchlet ref="prepareBatchlet"/>
+    </step>
+
+    <step id="test">
+        <properties>
+            <property name="jberet.local-tx" value="true"/>
+        </properties>
+        <chunk item-count="30">
+            <reader ref="myItemReader"/>
+            <writer ref="myItemWriter"/>
+        </chunk>
+    </step>
+
+</job>
