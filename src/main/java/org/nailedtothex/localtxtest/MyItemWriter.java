@@ -25,10 +25,10 @@ public class MyItemWriter extends AbstractItemWriter {
 
     @Override
     public void writeItems(List<Object> items) throws Exception {
-        // We set jberet.local-tx=true in job xml so we have to manipulate transactions with UserTransaction
-        ut.begin();
         try (Connection cn = ds.getConnection();
              PreparedStatement ps = cn.prepareStatement(getSQL())) {
+            // We set jberet.local-tx=true in job xml so we have to manipulate transactions with UserTransaction
+            ut.begin();
             for (Object o : items) {
                 bindParameters(ps, o);
                 ps.addBatch();
